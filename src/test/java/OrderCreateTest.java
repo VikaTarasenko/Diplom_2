@@ -1,15 +1,18 @@
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.http.ContentType;
-import io.restassured.mapper.ObjectMapper;
+import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ValidatableResponse;
-import org.apache.groovy.util.Maps;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
+
 
 public class OrderCreateTest {
 private final RegisterClient client = new RegisterClient();
@@ -21,7 +24,6 @@ private final RegisterClient client = new RegisterClient();
     @Test
     @DisplayName("Создание заказа")
     public void order() { // создаем заказ
-
         var register = registerGenerator.random();
         ValidatableResponse creationResponse = client.create(register);
         check.createdSuccessfully(creationResponse);
@@ -36,14 +38,20 @@ private final RegisterClient client = new RegisterClient();
                 .get("https://stellarburgers.nomoreparties.site/api/ingredients")
                 .then()
                 .extract().path("data._id");
-        var Ing = new String[]{"ingredients", ingredient.toString()};
+        Map<String,String> ingredients = new HashMap<>();
+        ingredients.put("ingredients", ingredient.get(2));
+        ingredients.put("ingredients", ingredient.get(3));
+
         given().log().all()
                 .contentType(ContentType.JSON)
                 .baseUri(BASE_URI)
-                .body(Ing)
+                .body(ingredients)
                 .when()
                 .post("/api/orders")
-                .then().log().all();
+                .then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("success", is(true));;
 
     }
     }

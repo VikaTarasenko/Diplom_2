@@ -7,7 +7,7 @@ public class Order {
         this.ingredients = ingredients.toArray(new String[0]);
     }
 
-     public String[] getIngredients() {
+    public String[] getIngredients() {
         return ingredients;
     }
 
